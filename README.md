@@ -943,7 +943,7 @@ export default {
 
 © 2025 bmzashura. All rights reserved.
 
-Proyek ini dibuat untuk Tugas Akhir Semester. Bebas digunakan dan dimodifikasi untuk keperluan pendidikan dan komersial.
+Proyek ini dibuat untuk Ujian Tengah Semester. Bebas digunakan dan dimodifikasi untuk keperluan pendidikan dan komersial.
 
 ---
 
