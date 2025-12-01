@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Manajemen Tugas - Premium SaaS</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Local CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gradient-to-br from-indigo-950 via-slate-900 to-violet-950">
+    <div id="app" v-cloak>
+        <!-- ============================================
+             HEADER - Premium Glassmorphism
+             ============================================ -->
+        <header class="sticky top-0 z-50 glass-effect border-b border-white/10 shadow-xl">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-24 sm:h-28">
+                    <!-- Logo Section -->
+                    <div class="flex items-center gap-4 flex-shrink-0">
+                        <img src="images/white-logo.png" alt="TaskFlow Logo" class="h-28 w-28 object-contain drop-shadow-lg">
+                        <div class="hidden sm:block">
+                            <h1 class="text-lg sm:text-xl font-bold bg-gradient-to-r from-violet-200 to-blue-200 bg-clip-text text-transparent">TcelFlow</h1>
+                            <p class="text-xs text-white/40">Telkomcel Task Manager</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation Tabs + Storage Status + Export -->
+                    <div class="flex gap-2 items-center">
+                        <div class="flex gap-2">
+                            <button
+                                @click="currentTab = 'tasks'"
+                                :class="[
+                                    'px-3 sm:px-4 py-2 rounded-lg font-medium text-sm transition-all',
+                                    currentTab === 'tasks'
+                                        ? 'bg-gradient-to-r from-violet-500 to-blue-500 text-white shadow-lg'
+                                        : 'text-white/60 hover:text-white/80 hover:bg-white/5'
+                                ]"
+                            >
+                                <span class="hidden sm:inline">Tugas</span>
+                                <span class="sm:hidden">📋</span>
+                            </button>
+                            <button
+                                @click="currentTab = 'pics'"
+                                :class="[
+                                    'px-3 sm:px-4 py-2 rounded-lg font-medium text-sm transition-all',
+                                    currentTab === 'pics'
+                                        ? 'bg-gradient-to-r from-violet-500 to-blue-500 text-white shadow-lg'
+                                        : 'text-white/60 hover:text-white/80 hover:bg-white/5'
+                                ]"
+                            >
+                                <span class="hidden sm:inline">Orang</span>
+                                <span class="sm:hidden">👥</span>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center gap-3 ml-2">
+                            <div class="hidden sm:flex items-center gap-3 text-white/80 text-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7M3 7l9 6 9-6" />
+                                </svg>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-xs text-white/60">Tugas</span>
+                                    <span class="font-semibold">{{ tasksCount }}</span>
+                                </div>
+                                <span class="text-white/30">•</span>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-xs text-white/60">Orang</span>
+                                    <span class="font-semibold">{{ picsCount }}</span>
+                                </div>
+                            </div>
+
+                            <button
+                                @click="exportData()"
+                                class="ml-2 px-3 py-2 bg-white/8 text-white rounded-lg font-medium hover:bg-white/12 text-sm flex items-center gap-2"
+                                title="Export JSON"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v12m0 0l-4-4m4 4l4-4M21 21H3"/>
+                                </svg>
+                                <span class="hidden sm:inline">Export</span>
+                            </button>
+
+                            <!-- Import Button -->
+                            <input
+                                ref="importFileInput"
+                                type="file"
+                                id="importFile"
+                                accept=".json"
+                                style="display: none;"
+                                @change="handleFileImport"
+                            />
+                            <button
+                                @click="importFileInput.click()"
+                                class="ml-2 px-3 py-2 bg-white/8 text-white rounded-lg font-medium hover:bg-white/12 text-sm flex items-center gap-2"
+                                title="Import JSON"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v12m0 0l4 4m-4-4l-4 4M3 21h18"/>
+                                </svg>
+                                <span class="hidden sm:inline">Import</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================================
+             MAIN CONTENT
+             ============================================ -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-32">
+            <!-- TASKS TAB -->
+            <section v-show="currentTab === 'tasks'" class="animate-fadeInSlideUp">
+                <div class="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                    <div>
+                        <h2 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-white to-white/80 bg-clip-text text-transparent">Papan Tugas</h2>
+                        <p class="text-white/40 text-sm mt-1">Kelola tugas Anda di berbagai status</p>
+                    </div>
+                    <button
+                        @click="openTaskModal()"
+                        class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-violet-500 to-blue-500 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-violet-500/50 transition-all active:scale-95 flex items-center justify-center gap-2"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>Tugas Baru</span>
+                    </button>
+                </div>
+
+                <!-- Kanban Board -->
+                <div class="kanban-board">
+                    <!-- Todo Column -->
+                    <div class="kanban-column">
+                        <div class="kanban-column-header">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-yellow-400 rounded-full shadow-lg shadow-yellow-400/50"></span>
+                                <h3 class="font-semibold text-white">Belum Dimulai</h3>
+                            </div>
+                            <span class="text-xs text-white/60 bg-white/10 px-2.5 py-1 rounded-full font-medium">{{ getTodos.length }}</span>
+                        </div>
+                        <div class="kanban-column-content">
+                            <div
+                                v-for="task in getTodos"
+                                :key="task.id"
+                                class="task-card hover-card-lift"
+                            >
+                                <div class="flex justify-between items-start gap-2 mb-2">
+                                    <h4 class="task-card-title">{{ task.title }}</h4>
+                                    <div class="flex gap-1">
+                                        <button
+                                            @click="openTaskModal(task)"
+                                            class="p-1.5 text-white/50 hover:text-violet-400 transition-colors hover:bg-white/10 rounded-md"
+                                            title="Edit"
+                                        >
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                                            </svg>
+                                        </button>
+                                        <button
+                                            @click="deleteTask(task.id)"
+                                            class="p-1.5 text-white/50 hover:text-red-400 transition-colors hover:bg-white/10 rounded-md"
+                                            title="Delete"
+                                        >
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p v-if="task.description" class="task-card-description">{{ task.description }}</p>
+                                <div v-if="task.assignedPics.length > 0" class="flex flex-wrap gap-1">
+                                    <span
+                                        v-for="picId in task.assignedPics"
+                                        :key="picId"
+                                        class="assigned-tag"
+                                    >
+                                        {{ getPicName(picId) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div v-if="getTodos.length === 0" class="kanban-column-empty">
+                                Tidak ada tugas
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- In Progress Column -->
+                    <div class="kanban-column">
+                        <div class="kanban-column-header">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-400/50"></span>
+                                <h3 class="font-semibold text-white">Sedang Dikerjakan</h3>
+                            </div>
+                            <span class="text-xs text-white/60 bg-white/10 px-2.5 py-1 rounded-full font-medium">{{ getInProgress.length }}</span>
+                        </div>
+                        <div class="kanban-column-content">
+                            <div
+                                v-for="task in getInProgress"
+                                :key="task.id"
+                                class="task-card hover-card-lift"
+                            >
+                                <div class="flex justify-between items-start gap-2 mb-2">
+                                    <h4 class="task-card-title">{{ task.title }}</h4>
+                                    <div class="flex gap-1">
+                                        <button
+                                            @click="openTaskModal(task)"
+                                            class="p-1.5 text-white/50 hover:text-violet-400 transition-colors hover:bg-white/10 rounded-md"
+                                            title="Edit"
+                                        >
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                                            </svg>
+                                        </button>
+                                        <button
+                                            @click="deleteTask(task.id)"
+                                            class="p-1.5 text-white/50 hover:text-red-400 transition-colors hover:bg-white/10 rounded-md"
+                                            title="Delete"
+                                        >
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p v-if="task.description" class="task-card-description">{{ task.description }}</p>
+                                <div v-if="task.assignedPics.length > 0" class="flex flex-wrap gap-1">
+                                    <span
+                                        v-for="picId in task.assignedPics"
+                                        :key="picId"
+                                        class="assigned-tag"
+                                    >
+                                        {{ getPicName(picId) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div v-if="getInProgress.length === 0" class="kanban-column-empty">
+                                Tidak ada tugas
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Done Column -->
+                    <div class="kanban-column">
+                        <div class="kanban-column-header">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 bg-green-400 rounded-full shadow-lg shadow-green-400/50"></span>
+                                <h3 class="font-semibold text-white">Selesai</h3>
+                            </div>
+                            <span class="text-xs text-white/60 bg-white/10 px-2.5 py-1 rounded-full font-medium">{{ getDone.length }}</span>
+                        </div>
+                        <div class="kanban-column-content">
+                            <div
+                                v-for="task in getDone"
+                                :key="task.id"
+                                class="task-card hover-card-lift opacity-75"
+                            >
+                                <div class="flex justify-between items-start gap-2 mb-2">
+                                    <h4 class="task-card-title line-through">{{ task.title }}</h4>
+                                    <div class="flex gap-1">
+                                        <button
+                                            @click="openTaskModal(task)"
+                                            class="p-1.5 text-white/50 hover:text-violet-400 transition-colors hover:bg-white/10 rounded-md"
+                                            title="Edit"
+                                        >
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                                            </svg>
+                                        </button>
+                                        <button
+                                            @click="deleteTask(task.id)"
+                                            class="p-1.5 text-white/50 hover:text-red-400 transition-colors hover:bg-white/10 rounded-md"
+                                            title="Delete"
+                                        >
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p v-if="task.description" class="task-card-description">{{ task.description }}</p>
+                                <div v-if="task.assignedPics.length > 0" class="flex flex-wrap gap-1">
+                                    <span
+                                        v-for="picId in task.assignedPics"
+                                        :key="picId"
+                                        class="assigned-tag"
+                                    >
+                                        {{ getPicName(picId) }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div v-if="getDone.length === 0" class="kanban-column-empty">
+                                Tidak ada tugas
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- PEOPLE (PICs) TAB -->
+            <section v-show="currentTab === 'pics'" class="animate-fadeInSlideUp">
+                <div class="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                    <div>
+                        <h2 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-white via-white to-white/80 bg-clip-text text-transparent">Orang dalam Kontak</h2>
+                        <p class="text-white/40 text-sm mt-1">Kelola anggota tim dan kolaborator Anda</p>
+                    </div>
+                    <button
+                        @click="openPicModal()"
+                        class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-violet-500 to-blue-500 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-violet-500/50 transition-all active:scale-95 flex items-center justify-center gap-2"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        <span>Tambah Orang</span>
+                    </button>
+                </div>
+
+                <!-- PICs Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div
+                        v-for="pic in pictures"
+                        :key="pic.id"
+                        class="glass-effect rounded-xl p-5 hover-card-lift group"
+                    >
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-white text-lg">{{ pic.name }}</h3>
+                                <p class="text-sm text-white/60">{{ pic.role }}</p>
+                            </div>
+                            <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                    @click="openPicModal(pic)"
+                                    class="p-2.5 text-white/60 hover:text-violet-400 transition-colors hover:bg-white/10 rounded-lg"
+                                    title="Edit"
+                                >
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                                    </svg>
+                                </button>
+                                <button
+                                    @click="deletePic(pic.id)"
+                                    class="p-2.5 text-white/60 hover:text-red-400 transition-colors hover:bg-white/10 rounded-lg"
+                                    title="Delete"
+                                >
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="text-xs text-white/30 font-mono">ID: {{ pic.id }}</div>
+                    </div>
+
+                    <!-- Empty state -->
+                    <div v-if="pictures.length === 0" class="col-span-full">
+                        <div class="text-center py-16">
+                            <svg class="w-16 h-16 text-white/20 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.682"></path>
+                            </svg>
+                            <p class="text-white/40 text-lg">Belum ada orang yang ditambahkan</p>
+                            <p class="text-white/30 text-sm mt-1">Klik "Tambah Orang" untuk memulai</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- ============================================
+             TASK MODAL - Premium Style
+             ============================================ -->
+        <div
+            v-if="showTaskModal"
+            class="fixed inset-0 z-50 flex items-end lg:items-center justify-center modal-overlay animate-fadeIn"
+            @click.self="closeTaskModal()"
+        >
+            <div
+                class="glass-effect-light w-full lg:w-full lg:max-w-lg rounded-t-3xl lg:rounded-2xl p-6 animate-slideInUp lg:animate-scalePop max-h-[90vh] overflow-y-auto"
+                @click.stop
+            >
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                        {{ editingTaskId ? 'Ubah Tugas' : 'Buat Tugas Baru' }}
+                    </h2>
+                    <button
+                        @click="closeTaskModal()"
+                        class="p-2 text-white/40 hover:text-white/80 transition-colors hover:bg-white/10 rounded-lg"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <form @submit.prevent="saveTask" class="space-y-5">
+                    <!-- Title -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Judul *</label>
+                        <input
+                            v-model="taskForm.title"
+                            type="text"
+                            placeholder="Masukkan judul tugas"
+                            class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none transition-all"
+                            required
+                        />
+                    </div>
+
+                    <!-- Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Deskripsi</label>
+                        <textarea
+                            v-model="taskForm.description"
+                            placeholder="Masukkan deskripsi tugas"
+                            rows="3"
+                            class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none transition-all resize-none"
+                        ></textarea>
+                    </div>
+
+                    <!-- Status -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Status *</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button
+                                v-for="status in ['Belum Dimulai', 'Sedang Dikerjakan', 'Selesai']"
+                                :key="status"
+                                type="button"
+                                @click="taskForm.status = status"
+                                :class="[
+                                    'px-3 py-2.5 rounded-lg font-medium transition-all text-sm',
+                                    taskForm.status === status
+                                        ? 'bg-gradient-to-r from-violet-500 to-blue-500 text-white shadow-lg'
+                                        : 'bg-white/10 text-white/60 hover:bg-white/20 border border-white/10'
+                                ]"
+                            >
+                                {{ status }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Assign PICs -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Tugaskan kepada Orang</label>
+                        <div class="space-y-2 max-h-48 overflow-y-auto bg-white/5 border border-white/10 rounded-lg p-3">
+                            <div v-if="pictures.length === 0" class="text-sm text-white/40 py-4 text-center">
+                                Tidak ada orang yang tersedia. Tambahkan orang terlebih dahulu.
+                            </div>
+                            <label
+                                v-for="pic in pictures"
+                                :key="pic.id"
+                                class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 cursor-pointer transition-all"
+                            >
+                                <input
+                                    type="checkbox"
+                                    :checked="taskForm.assignedPics.includes(pic.id)"
+                                    @change="togglePicAssignment(pic.id)"
+                                    class="w-4 h-4 text-violet-500 rounded border-white/20 bg-white/10 focus:ring-2 focus:ring-violet-500"
+                                />
+                                <div>
+                                    <p class="font-medium text-white text-sm">{{ pic.name }}</p>
+                                    <p class="text-xs text-white/40">{{ pic.role }}</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Selected PICs Display -->
+                    <div v-if="taskForm.assignedPics.length > 0" class="bg-violet-500/20 border border-violet-500/30 p-3 rounded-lg">
+                        <p class="text-xs text-white/60 font-medium mb-2">Orang yang Ditugaskan:</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span
+                                v-for="picId in taskForm.assignedPics"
+                                :key="picId"
+                                class="assigned-tag"
+                            >
+                                {{ getPicName(picId) }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex gap-3 pt-4">
+                        <button
+                            type="button"
+                            @click="closeTaskModal()"
+                            class="flex-1 px-4 py-2.5 border border-white/20 text-white/80 rounded-lg font-medium hover:bg-white/10 transition-all active:scale-95"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            class="flex-1 px-4 py-2.5 bg-gradient-to-r from-violet-500 to-blue-500 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-violet-500/50 transition-all active:scale-95"
+                        >
+                            {{ editingTaskId ? 'Ubah' : 'Buat' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ============================================
+             PIC MODAL - Premium Style
+             ============================================ -->
+        <div
+            v-if="showPicModal"
+            class="fixed inset-0 z-50 flex items-end lg:items-center justify-center modal-overlay animate-fadeIn"
+            @click.self="closePicModal()"
+        >
+            <div
+                class="glass-effect-light w-full lg:w-full lg:max-w-md rounded-t-3xl lg:rounded-2xl p-6 animate-slideInUp lg:animate-scalePop"
+                @click.stop
+            >
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
+                        {{ editingPicId ? 'Ubah Orang' : 'Tambah Orang Baru' }}
+                    </h2>
+                    <button
+                        @click="closePicModal()"
+                        class="p-2 text-white/40 hover:text-white/80 transition-colors hover:bg-white/10 rounded-lg"
+                    >
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <form @submit.prevent="savePic" class="space-y-5">
+                    <!-- Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Nama *</label>
+                        <input
+                            v-model="picForm.name"
+                            type="text"
+                            placeholder="Masukkan nama lengkap"
+                            class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none transition-all"
+                            required
+                        />
+                    </div>
+
+                    <!-- Role -->
+                    <div>
+                        <label class="block text-sm font-medium text-white mb-2">Posisi/Peran *</label>
+                        <input
+                            v-model="picForm.role"
+                            type="text"
+                            placeholder="Misalnya, Manajer Proyek, Pengembang"
+                            class="w-full px-4 py-2.5 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:ring-2 focus:ring-violet-500 focus:border-transparent outline-none transition-all"
+                            required
+                        />
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex gap-3 pt-4">
+                        <button
+                            type="button"
+                            @click="closePicModal()"
+                            class="flex-1 px-4 py-2.5 border border-white/20 text-white/80 rounded-lg font-medium hover:bg-white/10 transition-all active:scale-95"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            class="flex-1 px-4 py-2.5 bg-gradient-to-r from-violet-500 to-blue-500 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-violet-500/50 transition-all active:scale-95"
+                        >
+                            {{ editingPicId ? 'Ubah' : 'Tambah' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================
+         FOOTER - Sticky Footer
+         ============================================ -->
+    <footer class="sticky bottom-0 z-40 glass-effect border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+                <!-- Copyright Section -->
+                <div class="text-center sm:text-left">
+                    <p class="text-xs sm:text-sm text-white/70 font-medium">
+                        © 2025 <a href="https://github.com/bmzashura" target="_blank" class="text-violet-400 hover:text-violet-300 transition-colors font-semibold">bmzashura</a>. All rights reserved.
+                    </p>
+                </div>
+
+                <!-- Developer Section -->
+                <div class="text-center sm:text-right">
+                    <p class="text-xs sm:text-sm text-white/70 font-medium">
+                        Dikembangkan oleh <span class="text-white font-semibold">Bemis Huntala</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Local JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>

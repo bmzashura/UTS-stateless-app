@@ -1,0 +1,95 @@
+{
+  "exportedAt": "2025-12-01T10:30:00.000Z",
+  "tasks": [
+    {
+      "id": "1701414060000",
+      "title": "Design Homepage",
+      "description": "Buat desain mockup halaman utama website dengan responsive design",
+      "status": "Selesai",
+      "assignedPics": ["1701414000000", "1701414010000"],
+      "createdAt": "2025-12-01T08:00:00.000Z"
+    },
+    {
+      "id": "1701414070000",
+      "title": "Frontend Development",
+      "description": "Implementasi design ke dalam Vue.js component dengan Tailwind CSS",
+      "status": "Sedang Dikerjakan",
+      "assignedPics": ["1701414010000"],
+      "createdAt": "2025-12-01T08:15:00.000Z"
+    },
+    {
+      "id": "1701414080000",
+      "title": "Database Schema Design",
+      "description": "Merancang struktur database untuk task management system",
+      "status": "Belum Dimulai",
+      "assignedPics": ["1701414020000"],
+      "createdAt": "2025-12-01T08:30:00.000Z"
+    },
+    {
+      "id": "1701414090000",
+      "title": "API Development",
+      "description": "Buat REST API endpoints untuk task CRUD operations",
+      "status": "Belum Dimulai",
+      "assignedPics": ["1701414020000"],
+      "createdAt": "2025-12-01T08:45:00.000Z"
+    },
+    {
+      "id": "1701414100000",
+      "title": "Testing & QA",
+      "description": "Unit testing, integration testing, dan user acceptance testing",
+      "status": "Belum Dimulai",
+      "assignedPics": ["1701414030000"],
+      "createdAt": "2025-12-01T09:00:00.000Z"
+    },
+    {
+      "id": "1701414110000",
+      "title": "Dokumentasi Teknis",
+      "description": "Tulis dokumentasi API, code comments, dan README lengkap",
+      "status": "Sedang Dikerjakan",
+      "assignedPics": ["1701414030000"],
+      "createdAt": "2025-12-01T09:15:00.000Z"
+    },
+    {
+      "id": "1701414120000",
+      "title": "Deployment ke Production",
+      "description": "Setup server, deploy aplikasi, dan monitoring",
+      "status": "Belum Dimulai",
+      "assignedPics": ["1701414020000", "1701414030000"],
+      "createdAt": "2025-12-01T09:30:00.000Z"
+    },
+    {
+      "id": "1701414130000",
+      "title": "Security Audit",
+      "description": "Audit keamanan kode, dependency scanning, dan penetration testing",
+      "status": "Belum Dimulai",
+      "assignedPics": ["1701414000000"],
+      "createdAt": "2025-12-01T09:45:00.000Z"
+    }
+  ],
+  "pics": [
+    {
+      "id": "1701414000000",
+      "name": "Bemis Huntala",
+      "role": "Project Manager & Developer",
+      "createdAt": "2025-12-01T08:00:00.000Z"
+    },
+    {
+      "id": "1701414010000",
+      "name": "Sarah Johnson",
+      "role": "UI/UX Designer",
+      "createdAt": "2025-12-01T08:05:00.000Z"
+    },
+    {
+      "id": "1701414020000",
+      "name": "Michael Chen",
+      "role": "Backend Developer",
+      "createdAt": "2025-12-01T08:10:00.000Z"
+    },
+    {
+      "id": "1701414030000",
+      "name": "Jessica Martinez",
+      "role": "QA Engineer & Tester",
+      "createdAt": "2025-12-01T08:15:00.000Z"
+    }
+  ]
+}

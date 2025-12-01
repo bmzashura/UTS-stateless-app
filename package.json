@@ -1,0 +1,23 @@
+{
+  "name": "task-management-dashboard",
+  "version": "1.0.0",
+  "description": "Task Management Dashboard dengan Vue 3 dan Tailwind CSS",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "serve": "http-server -c-1 -o -p 8000"
+  },
+  "keywords": [
+    "vue3",
+    "tailwind",
+    "task-management",
+    "dashboard"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
