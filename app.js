@@ -188,6 +188,48 @@ createApp({
         const tasksCount = computed(() => tasks.value.length);
         const picsCount = computed(() => pictures.value.length);
 
+        // Notifications (toasts) - non-blocking user-friendly messages
+        const notifications = ref([]);
+        const notify = (message, type = 'success', timeout = 3500) => {
+            try {
+                const id = Date.now().toString() + Math.random().toString(36).slice(2, 8);
+                notifications.value.push({ id, message, type });
+                // Auto-dismiss
+                setTimeout(() => {
+                    notifications.value = notifications.value.filter(n => n.id !== id);
+                }, timeout);
+            } catch (e) {
+                console.warn('Notify failed', e);
+            }
+        };
+        const dismissNotification = (id) => {
+            notifications.value = notifications.value.filter(n => n.id !== id);
+        };
+        
+        // Custom non-blocking confirm dialog (promise-based)
+        const confirmDialog = ref({ visible: false, title: '', message: '', _resolve: null });
+
+        const showConfirm = (message, title = 'Konfirmasi') => {
+            return new Promise((resolve) => {
+                confirmDialog.value.title = title;
+                confirmDialog.value.message = message;
+                confirmDialog.value.visible = true;
+                confirmDialog.value._resolve = resolve;
+            });
+        };
+
+        const confirmDialogConfirm = () => {
+            if (confirmDialog.value._resolve) confirmDialog.value._resolve(true);
+            confirmDialog.value.visible = false;
+            confirmDialog.value._resolve = null;
+        };
+
+        const confirmDialogCancel = () => {
+            if (confirmDialog.value._resolve) confirmDialog.value._resolve(false);
+            confirmDialog.value.visible = false;
+            confirmDialog.value._resolve = null;
+        };
+
         // Export semua data sebagai file JSON
         const exportData = () => {
             try {
@@ -205,8 +247,10 @@ createApp({
                 a.click();
                 a.remove();
                 URL.revokeObjectURL(url);
+                notify('Data berhasil diekspor — file sedang diunduh.', 'success');
             } catch (e) {
                 console.error('Gagal mengekspor data:', e);
+                notify('Gagal mengekspor data: ' + (e.message || e), 'error');
             }
         };
 
@@ -224,14 +268,13 @@ createApp({
                     throw new Error('Format JSON invalid: tidak ada array "pics"');
                 }
 
-                // Confirm sebelum overwrite
-                const confirm = window.confirm(
-                    `Import data dari ${new Date(data.exportedAt).toLocaleString()}?\n` +
-                    `Tugas: ${data.tasks.length}, Orang: ${data.pics.length}\n` +
-                    `(Data lama akan ditimpa)`
+                // Confirm sebelum overwrite (custom non-blocking dialog)
+                const ok = await showConfirm(
+                    `Import data dari ${new Date(data.exportedAt).toLocaleString()}?\nTugas: ${data.tasks.length}, Orang: ${data.pics.length}\n(Data lama akan ditimpa)`,
+                    'Import Data'
                 );
 
-                if (!confirm) return;
+                if (!ok) return;
 
                 // Restore data
                 tasks.value = data.tasks;
@@ -241,10 +284,10 @@ createApp({
                 await saveToStorage();
 
                 console.log('✅ Data berhasil diimport');
-                alert('Data berhasil diimport!');
+                notify('Data berhasil diimport!', 'success');
             } catch (e) {
                 console.error('Gagal mengimport data:', e);
-                alert('Gagal mengimport data: ' + e.message);
+                notify('Gagal mengimport data: ' + (e.message || e), 'error');
             }
         };
 
@@ -337,6 +380,8 @@ createApp({
                         status: taskForm.status,
                         assignedPics: [...taskForm.assignedPics]
                     };
+                    // Notifikasi: berhasil edit
+                    notify('Tugas berhasil diperbarui!', 'success');
                 }
             } else {
                 // CREATE mode - buat task baru
@@ -350,6 +395,8 @@ createApp({
                 };
                 // Tambahkan task baru ke array
                 tasks.value.push(newTask);
+                // Notifikasi: berhasil tambah
+                notify('Tugas berhasil ditambahkan!', 'success');
             }
 
             // Tutup modal setelah simpan
@@ -357,12 +404,11 @@ createApp({
         };
 
         // Fungsi untuk menghapus task
-        const deleteTask = (taskId) => {
-            // Tampilkan konfirmasi dialog
-            if (confirm('Apakah Anda yakin ingin menghapus task ini?')) {
-                // Filter array task, hanya tampilkan yang ID-nya berbeda
-                tasks.value = tasks.value.filter(t => t.id !== taskId);
-            }
+        const deleteTask = async (taskId) => {
+            const ok = await showConfirm('Apakah Anda yakin ingin menghapus task ini?', 'Hapus Tugas');
+            if (!ok) return;
+            tasks.value = tasks.value.filter(t => t.id !== taskId);
+            notify('Tugas berhasil dihapus!', 'success');
         };
 
         // ============================================
@@ -410,6 +456,8 @@ createApp({
                         name: picForm.name,
                         role: picForm.role
                     };
+                    // Notifikasi: berhasil edit PIC
+                    notify('Orang berhasil diperbarui!', 'success');
                 }
             } else {
                 // CREATE mode - buat PIC baru
@@ -421,6 +469,8 @@ createApp({
                 };
                 // Tambahkan PIC baru ke array
                 pictures.value.push(newPic);
+                // Notifikasi: berhasil tambah PIC
+                notify('Orang berhasil ditambahkan!', 'success');
             }
 
             // Tutup modal setelah simpan
@@ -428,12 +478,11 @@ createApp({
         };
 
         // Fungsi untuk menghapus PIC
-        const deletePic = (picId) => {
-            // Tampilkan konfirmasi dialog
-            if (confirm('Apakah Anda yakin? Task yang ditugaskan kepada orang ini akan tetap ada.')) {
-                // Filter array PIC, hanya tampilkan yang ID-nya berbeda
-                pictures.value = pictures.value.filter(p => p.id !== picId);
-            }
+        const deletePic = async (picId) => {
+            const ok = await showConfirm('Apakah Anda yakin? Task yang ditugaskan kepada orang ini akan tetap ada.', 'Hapus Orang');
+            if (!ok) return;
+            pictures.value = pictures.value.filter(p => p.id !== picId);
+            notify('Orang berhasil dihapus!', 'success');
         };
 
         // ============================================
@@ -515,6 +564,15 @@ createApp({
             // Helpers
             getPicName,
             togglePicAssignment,
+            // Notifications
+            notifications,
+            notify,
+            dismissNotification,
+            // Confirm dialog
+            confirmDialog,
+            confirmDialogConfirm,
+            confirmDialogCancel,
+            showConfirm,
             
             // Task functions
             openTaskModal,

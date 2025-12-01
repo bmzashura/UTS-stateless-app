@@ -951,3 +951,29 @@ Proyek ini dibuat untuk Ujian Tengah Semester. Bebas digunakan dan dimodifikasi 
 **Version**: 1.3.0 - Import/Export Complete Edition  
 **App Name**: TcelFlow - Telkomcel Task Manager  
 **Status**: Production Ready ✅
+
+---
+
+## 🔔 Notifikasi & Konfirmasi (Toast + Dialog)
+
+Mulai versi ini, aplikasi menggunakan sistem notifikasi non-blocking (toast) dan dialog konfirmasi kustom untuk pengalaman pengguna yang lebih halus.
+
+- Toast: muncul di pojok kanan-bawah, non-blocking, otomatis menghilang setelah beberapa detik dan dapat ditutup manual.
+- Tipe: `success` (hijau, centang) dan `error` (merah, silang).
+- Contoh pesan:
+    - `Tugas berhasil ditambahkan!`
+    - `Tugas berhasil diperbarui!`
+    - `Tugas berhasil dihapus!`
+    - `Orang berhasil ditambahkan!`
+    - `Data berhasil diekspor — file sedang diunduh.`
+    - `Data berhasil diimport!`
+
+Dialog konfirmasi kustom menggantikan `window.confirm()` untuk operasi yang merusak (mis. hapus, import). Dialog ini non-blocking — Anda dapat menutupnya atau memilih tindakan. Contoh penggunaan di kode:
+
+```javascript
+// Menampilkan dialog konfirmasi yang mengembalikan Promise<boolean>
+const ok = await showConfirm('Apakah Anda yakin ingin menghapus task ini?', 'Hapus Tugas');
+if (ok) { /* lakukan hapus */ }
+```
+
+Pengembang dapat memodifikasi durasi toast atau teks dengan mengubah `notify(message, type, timeout)` di `app.js`.

@@ -389,3 +389,78 @@ body::before {
 [v-cloak] {
     display: none;
 }
+
+/* ============================================
+   TOAST / NOTIFICATION STYLES
+   Non-blocking, slide/fade in dengan ikon per-type
+   ============================================ */
+.toast-enter {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+}
+.toast-enter-active {
+    animation: toastIn 360ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.toast-leave-active {
+    animation: toastOut 300ms ease-in forwards;
+}
+@keyframes toastIn {
+    0% { opacity: 0; transform: translateY(16px) scale(0.98); }
+    60% { opacity: 1; transform: translateY(-6px) scale(1.02); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toastOut {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(12px) scale(0.98); }
+}
+
+.toast-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   CUSTOM CONFIRM DIALOG STYLES
+   Non-blocking confirmation modal (glass + buttons)
+   ============================================ */
+.confirm-dialog {
+    width: 100%;
+    max-width: 520px;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    background: rgba(17, 24, 39, 0.7);
+    border: 1px solid rgba(139, 92, 246, 0.18);
+    box-shadow: 0 20px 40px rgba(2,6,23,0.6);
+}
+.confirm-title {
+    font-weight: 700;
+    color: #fff;
+    font-size: 1.125rem;
+}
+.confirm-message {
+    color: rgba(255,255,255,0.85);
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+}
+.confirm-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+}
+.confirm-button {
+    padding: 0.6rem 0.9rem;
+    border-radius: 0.6rem;
+    font-weight: 600;
+}
+.confirm-button.primary {
+    background: linear-gradient(90deg,#7c3aed,#06b6d4);
+    color: white;
+}
+.confirm-button.ghost {
+    background: transparent;
+    color: rgba(255,255,255,0.9);
+    border: 1px solid rgba(255,255,255,0.06);
+}
+

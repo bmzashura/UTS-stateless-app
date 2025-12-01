@@ -575,6 +575,53 @@
                 </form>
             </div>
         </div>
+        <!-- Notification toasts (Vue-driven) -->
+        <div aria-live="polite" class="fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6">
+            <div class="w-full flex flex-col items-end space-y-2">
+                <transition-group name="toast" tag="div">
+                    <div v-for="note in notifications" :key="note.id" class="max-w-sm w-full pointer-events-auto">
+                        <div :class="[
+                            'rounded-lg p-3 shadow-lg flex items-start gap-3 transition-smooth',
+                            note.type === 'success' ? 'bg-emerald-500/95 text-white' : 'bg-red-500/95 text-white'
+                        ]">
+                            <!-- Icon -->
+                            <div class="toast-icon flex items-center justify-center">
+                                <template v-if="note.type === 'success'">
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </template>
+                                <template v-else>
+                                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </template>
+                            </div>
+                            <div class="flex-1 text-sm font-medium">{{ note.message }}</div>
+                            <button @click="dismissNotification(note.id)" class="ml-2 text-white/90 hover:text-white font-bold">✕</button>
+                        </div>
+                    </div>
+                </transition-group>
+            </div>
+        </div>
+
+        <!-- Custom Confirm Dialog (non-blocking) -->
+        <div v-if="confirmDialog.visible" class="fixed inset-0 z-60 flex items-center justify-center modal-overlay">
+            <div class="confirm-dialog">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="confirm-title">{{ confirmDialog.title || 'Konfirmasi' }}</div>
+                        <div class="confirm-message">{{ confirmDialog.message }}</div>
+                    </div>
+                    <button @click="confirmDialogCancel()" class="p-2 text-white/40 hover:text-white">✕</button>
+                </div>
+                <div class="confirm-actions">
+                    <button @click="confirmDialogCancel()" class="confirm-button ghost">Batal</button>
+                    <button @click="confirmDialogConfirm()" class="confirm-button primary">Ya, Lanjutkan</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- ============================================
