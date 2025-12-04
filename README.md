@@ -1,8 +1,8 @@
-# TcelFlow - Telkomcel Task Manager (Premium SaaS Edition)
+# TcelFlow - Telkomcel Task Manager 
 
 Dashboard manajemen tugas modern dengan desain Premium SaaS, dibangun menggunakan Vue.js 3, Tailwind CSS CDN, dan dual-layer storage (IndexedDB + localStorage) untuk persistensi data yang kokoh.
 
-![TcelFlow](images/white-logo.png)
+![TcelFlow](images/Screenshot_app.png)
 
 ---
 
