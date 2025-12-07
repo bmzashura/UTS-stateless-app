@@ -6,6 +6,27 @@ Dashboard manajemen tugas modern dengan desain Premium SaaS, dibangun menggunaka
 
 ---
 
+## 👤 Persona & Target User
+
+Deskripsi singkat persona yang paling terbantu oleh aplikasi ini dan target pengguna utama.
+
+- **Product / Project Manager** — Butuh papan tugas visual untuk mengatur backlog, menetapkan prioritas, menugaskan orang, dan mengekspor data untuk laporan.
+- **Technical Lead / Developer** — Menggunakan aplikasi untuk melihat tugas yang ditugaskan, mengubah status ketika selesai, dan menjaga catatan tugas lokal (IndexedDB) tanpa konfigurasi server.
+- **UI/UX Designer** — Mengelola tugas desain, mengunggah deskripsi, dan melihat tugas yang terkait dengan anggota tim.
+- **QA Engineer / Tester** — Melihat tugas yang siap diuji dan menandai status Selesai, menggunakan export/import untuk memindahkan skenario pengujian.
+- **Student / Educator (UTS / Proyek kecil)** — Cocok untuk demonstrasi, latihan manajemen proyek, dan tugas kuliah yang membutuhkan backup data lokal (export/import).
+
+Target pengguna:
+- Tim kecil (2–15 orang) yang membutuhkan kanban lokal tanpa backend.
+- Freelancers atau kontraktor yang butuh alat ringan untuk manajemen tugas.
+- Pelajar dan instruktur yang memerlukan aplikasi demo untuk mengajarkan proses agile/kanban.
+
+Keuntungan untuk persona:
+- Akses cepat tanpa setup server — data persist ke IndexedDB + localStorage.
+- Export/Import JSON untuk backup, sharing, atau migrasi antar perangkat.
+- Non-blocking toast notifications dan konfirmasi kustom untuk UX lebih halus.
+
+
 ## 📋 Fitur Utama
 
 ### ✅ Manajemen Tugas (Task Management)
@@ -487,6 +508,26 @@ File `sample-data.json` tersedia untuk testing fitur import:
 4. Konfirmasi import (akan menampilkan: 8 Tugas, 4 Orang)
 5. Klik OK untuk restore data sample
 6. Lihat data tampil di Papan Tugas dan Tab Orang
+
+### 📸 Screenshot — Langkah Penggunaan
+
+Berikut beberapa screenshot yang menunjukkan alur umum penggunaan aplikasi. File gambar ada di folder `images/`.
+
+- Menambah tugas (modal create):
+
+    ![Add Task](images/add_tugas_1.png)
+
+- Menambah orang (PIC):
+
+    ![Add Person](images/add_person_1.png)
+
+- Tampilan utama (dashboard):
+
+    ![App Screenshot](images/Screenshot_app.png)
+
+- Contoh task list (ikon & kartu tugas):
+
+    ![Tugas List](images/tugas.png)
 
 **Struktur Sample Data**:
 - **8 Tasks**: Berbagai status (Selesai: 1, Sedang Dikerjakan: 2, Belum Dimulai: 5)
