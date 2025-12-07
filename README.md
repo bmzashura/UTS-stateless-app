@@ -977,3 +977,26 @@ if (ok) { /* lakukan hapus */ }
 ```
 
 Pengembang dapat memodifikasi durasi toast atau teks dengan mengubah `notify(message, type, timeout)` di `app.js`.
+
+---
+
+## 📌 Sumber Snippet Code (file & nomor baris)
+
+Untuk mempermudah navigasi, berikut peta lokasi setiap potongan kode (snippet) yang ada di README ke file sumbernya di repository beserta nomor baris yang relevan.
+
+- **Kode Contoh - Membuat Task Baru**: `app.js` lines 366–402
+- **Kode Contoh - Menambah Orang**: `app.js` lines 444–476
+- **Sticky Header & Footer (HTML example)**: `index.html` header lines 25–140, main snippet lines 121–140, footer lines 630–654
+- **Kode Helper IndexedDB (openIDB / idbSet / idbGet)**: `app.js` lines 61–108
+- **Dual-Save Strategy (`saveToStorage`)**: `app.js` lines 154–176
+- **Load dengan Fallback (`loadFromStorage`)**: `app.js` lines 121–152
+- **Computed counts (`tasksCount`, `picsCount`)**: `app.js` lines 188–190
+- **Export Data (`exportData`)**: `app.js` lines 232–256
+- **Import Data (`importData`)**: `app.js` lines 258–312
+- **Export / Import buttons (template)**: `index.html` lines 80–110
+- **Debug Storage (`debugStorage`)**: `app.js` lines 497–524
+- **Sample data file**: `sample-data.json` lines 1–200 (sample dataset used for Import testing)
+- **Global background & glass styles example**: `styles.css` lines 1–40 (`body::before`, mesh gradient)
+- **`taskForm` definition (form fields)**: `app.js` lines 42–50
+
+Jika Anda ingin, saya bisa juga menambahkan nomor baris inline di atas setiap block code di README (mis. "Source: app.js lines X–Y") — beri tahu format yang Anda sukai (satu baris caption vs komentar di dalam block). 
